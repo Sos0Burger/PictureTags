@@ -21,6 +21,3 @@ databaseChangeLog:
               - column:
                   name: data
                   type: BLOB
-              - column:
-                  name: confidence
-                  type: REAL

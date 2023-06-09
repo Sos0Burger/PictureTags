@@ -12,6 +12,6 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TagDTO {
-    private Long confidence;
+    private Float confidence;
     private ArrayList<Tag> tags;
 }
