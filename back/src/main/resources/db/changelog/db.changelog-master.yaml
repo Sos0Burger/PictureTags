@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-master.yaml
+  - changeSet:
+      id: 1
+      author: sosoburger
+      runOnChange: true
+      changes:
+        - createTable:
+            tableName: picture
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: tags
+                  type: JSONB
+              - column:
+                  name: data
+                  type: BLOB
+              - column:
+                  name: confidence
+                  type: REAL
