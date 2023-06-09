@@ -21,3 +21,6 @@ databaseChangeLog:
               - column:
                   name: data
                   type: BLOB
+              - column:
+                  name: type
+                  type: VARCHAR(128)

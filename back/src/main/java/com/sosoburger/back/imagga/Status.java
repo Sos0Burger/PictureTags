@@ -1,4 +1,4 @@
-package com.sosoburger.back.dto;
+package com.sosoburger.back.imagga;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,10 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Tag{
-    private String en;
-    private String ru;
+@Setter
+public class Status {
+    private String text;
+    private String type;
 }
