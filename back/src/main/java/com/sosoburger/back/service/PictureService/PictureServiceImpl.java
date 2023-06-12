@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PictureServiceImpl implements PictureService {
@@ -29,7 +29,7 @@ public class PictureServiceImpl implements PictureService {
     @SneakyThrows
     @Override
     public PictureDTO save(MultipartFile picture) {
-        ArrayList<TagDTO> tagDTOs = getTags(picture);
+        List<TagDTO> tagDTOs = getTags(picture);
         try {
             return picturesRepository.save(new PictureDAO(null, tagDTOs, picture.getBytes(), picture.getContentType())).toDTO();
         }
@@ -49,7 +49,7 @@ public class PictureServiceImpl implements PictureService {
 
 
     @SneakyThrows
-    private ArrayList<TagDTO> getTags(MultipartFile picture) {
+    private List<TagDTO> getTags(MultipartFile picture) {
         try {
             var response = imaggaApi.upload(
                     MultipartBody.Part.createFormData(

@@ -11,7 +11,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "picture")
@@ -27,7 +27,7 @@ public class PictureDAO {
 
     @Column(name = "tags")
     @JdbcTypeCode(SqlTypes.JSON)
-    private ArrayList<TagDTO> tags;
+    private List<TagDTO> tags;
 
     @Column(name = "data")
     @Lob
@@ -36,8 +36,14 @@ public class PictureDAO {
     @Column(name = "type")
     private String type;
 
-    public PictureDTO toDTO(){
-        return new PictureDTO(ServletUriComponentsBuilder.fromCurrentContextPath().path("/picture/").path(id.toString()).toUriString(), tags);
+    public PictureDTO toDTO() {
+        return new PictureDTO(
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/picture/data/")
+                        .path(id.toString())
+                        .toUriString(),
+                tags);
     }
 
 }

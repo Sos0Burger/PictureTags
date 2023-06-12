@@ -1,4 +1,4 @@
-package com.sosoburger.back.dto;
+package org.sosoburger.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagDTO {
-    private Float confidence;
-    private Tag tag;
+public class Tag{
+    private String ru;
 }

@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagDTO {
-    private Float confidence;
-    private Tag tag;
+class Tag{
+    private String ru;
 }

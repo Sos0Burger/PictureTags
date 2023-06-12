@@ -14,7 +14,7 @@ public interface PictureApi {
     @Operation(description = "Загрузка файла на сервер для анализа")
     ResponseEntity<PictureDTO> upload(@RequestPart MultipartFile picture);
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/data/{id}")
     ResponseEntity<byte[]> getPicture(@PathVariable Integer id);
 
 }

@@ -1,15 +1,15 @@
 package com.sosoburger.back.imagga;
 
+import com.sosoburger.back.dto.TagDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadResponse {
-    private Result result;
-    private Status status;
+public class Result {
+    List<TagDTO> tags;
 }
