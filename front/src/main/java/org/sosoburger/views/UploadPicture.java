@@ -34,10 +34,10 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Route("")
-public class UploadImage extends VerticalLayout {
+public class UploadPicture extends VerticalLayout {
 
     private static final PictureApiImpl pictureApi = new PictureApiImpl();
-    public UploadImage() {
+    public UploadPicture() {
         this.setAlignItems(Alignment.CENTER);
 
         AtomicReference<MultipartBody.Part> multipartFile = new AtomicReference<>();

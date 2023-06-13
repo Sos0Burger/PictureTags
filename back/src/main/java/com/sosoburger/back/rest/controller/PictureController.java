@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class PictureController implements PictureApi {
     @Autowired
@@ -24,6 +27,18 @@ public class PictureController implements PictureApi {
     @Override
     public ResponseEntity<PictureDTO> upload(MultipartFile picture) {
         return new ResponseEntity<>(pictureService.save(picture), HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<List<PictureDTO>> getAll() {
+        List<PictureDTO> pictureDTOS = new ArrayList<>();
+
+        for (PictureDAO pic: pictureService.getAll()
+        ) {
+            pictureDTOS.add(pic.toDTO());
+        }
+
+        return new ResponseEntity<>(pictureDTOS, HttpStatus.OK);
     }
 
     @Override

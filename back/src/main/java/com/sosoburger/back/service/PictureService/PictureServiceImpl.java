@@ -47,6 +47,11 @@ public class PictureServiceImpl implements PictureService {
         throw new NotFoundException("Файл не найден");
     }
 
+    @Override
+    public List<PictureDAO> getAll() {
+        return picturesRepository.findAll();
+    }
+
 
     @SneakyThrows
     private List<TagDTO> getTags(MultipartFile picture) {
