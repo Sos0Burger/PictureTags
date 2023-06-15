@@ -36,6 +36,9 @@ public class PictureDAO {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "name")
+    private String name;
+
     public PictureDTO toDTO() {
         return new PictureDTO(
                 ServletUriComponentsBuilder
@@ -43,6 +46,7 @@ public class PictureDAO {
                         .path("/picture/data/")
                         .path(id.toString())
                         .toUriString(),
+                name,
                 tags);
     }
 

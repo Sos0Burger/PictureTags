@@ -13,6 +13,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,9 +32,16 @@ public class PictureServiceImpl implements PictureService {
     public PictureDTO save(MultipartFile picture) {
         List<TagDTO> tagDTOs = getTags(picture);
         try {
-            return picturesRepository.save(new PictureDAO(null, tagDTOs, picture.getBytes(), picture.getContentType())).toDTO();
-        }
-        catch (IOException exception){
+            return picturesRepository.save(
+                    new PictureDAO(
+                            null,
+                            tagDTOs,
+                            picture.getBytes(),
+                            picture.getContentType(),
+                            picture.getOriginalFilename()
+                    )
+            ).toDTO();
+        } catch (IOException exception) {
             throw new UploadException("Ошибка загрузки файла");
         }
     }
@@ -48,8 +56,25 @@ public class PictureServiceImpl implements PictureService {
     }
 
     @Override
-    public List<PictureDAO> getAll() {
-        return picturesRepository.findAll();
+    public List<PictureDAO> findBySearch(String search) {
+        if (search==null||search.isEmpty()){
+            return  picturesRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        }
+        return picturesRepository.findAll(Sort.by(Sort.Direction.DESC,"id")).
+                stream()
+                .filter(
+                        item->
+                                item.getTags()
+                                        .stream()
+                                        .anyMatch(
+                                                tag -> tag.getTag()
+                                                        .getRu().toLowerCase()
+                                                        .contains(search.toLowerCase())
+                                                ||      (tag.getConfidence().intValue()+"%")
+                                                        .contains(search)
+                                        )
+                )
+                .toList();
     }
 
 

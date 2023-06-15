@@ -12,6 +12,7 @@ import java.util.List;
 public class PictureDTO {
 
     private String pictureURL;
+    private String name;
     private List<TagDTO> tags;
 
 }

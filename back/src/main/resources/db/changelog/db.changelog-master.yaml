@@ -24,3 +24,6 @@ databaseChangeLog:
               - column:
                   name: type
                   type: VARCHAR(128)
+              - column:
+                  name: name
+                  type: VARCHAR(255)

@@ -2,6 +2,7 @@ package com.sosoburger.back.service.PictureService;
 
 import com.sosoburger.back.dao.PictureDAO;
 import com.sosoburger.back.dto.PictureDTO;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -12,5 +13,5 @@ public interface PictureService {
 
     PictureDAO getPicture(Integer id);
 
-    List<PictureDAO> getAll();
+    List<PictureDAO> findBySearch(@Param("search") String search);
 }

@@ -1,12 +1,17 @@
 package org.sosoburger.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
@@ -26,18 +31,27 @@ public class UploadedPictures extends VerticalLayout {
 
     Div text = new Div();
 
+    TextField searchField = new TextField();
+
+    Button searchButton = new Button("Найти");
+
     private final ComponentRenderer<Component, PictureDTO> pictureRenderer = new ComponentRenderer<>(
             picture -> {
-                VerticalLayout pictureLayout = new VerticalLayout();
+                HorizontalLayout pictureLayout = new HorizontalLayout();
                 pictureLayout.setMargin(true);
                 pictureLayout.setAlignItems(Alignment.CENTER);
+                pictureLayout.setDefaultVerticalComponentAlignment(Alignment.START);
 
                 Image image = new Image(picture.getPictureURL(), "https://i.imgur.com/UWzk1sl.png");
-                pictureLayout.add(image);
+
+                Details details = new Details(picture.getName(), image);
+                details.getSummary().getStyle().set("font-size", "30px");
+                details.getSummary().getStyle().set("color", "blue");
+                pictureLayout.add(details);
 
                 Grid<TagDTO> tagGrid = new Grid<>();
-                tagGrid.setMinWidth("256px");
                 tagGrid.setAllRowsVisible(true);
+
 
                 tagGrid.setItems(picture.getTags());
                 tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getTag().getRu()))
@@ -46,11 +60,7 @@ public class UploadedPictures extends VerticalLayout {
                 tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getConfidence().intValue() + "%"))
                         .setHeader("Точность").setComparator(TagDTO::getConfidence).setAutoWidth(true);
 
-                Details details = new Details("Теги", tagGrid);
-                details.getSummary().getStyle().set("font-size", "30px");
-                details.getSummary().getStyle().set("color", "blue");
-
-                pictureLayout.add(details);
+                pictureLayout.add(tagGrid);
                 return pictureLayout;
             });
 
@@ -58,15 +68,26 @@ public class UploadedPictures extends VerticalLayout {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
 
+        searchField.setWidth("50%");
+        searchField.setPlaceholder("Поиск");
+        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+
+        searchButton.addClickListener(event->setUploadedPictures(searchField.getValue()));
+
+        HorizontalLayout searchLayout = new HorizontalLayout(searchField, searchButton);
+
         pictureList.setRenderer(pictureRenderer);
-        add(pictureList, text);
-        setUploadedPictures();
+
+
+
+        add(searchLayout, pictureList, text);
+        setUploadedPictures("");
     }
 
-    private void setUploadedPictures() {
+    private void setUploadedPictures(String search) {
         text.removeAll();
         try {
-            var response = pictureApi.getAll().execute();
+            var response = pictureApi.findBySearch(search).execute();
             if (response.isSuccessful()) {
                 pictureList.setItems(response.body());
             } else {

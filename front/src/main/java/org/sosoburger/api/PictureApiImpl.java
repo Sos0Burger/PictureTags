@@ -14,7 +14,7 @@ public class PictureApiImpl implements PictureApi{
     }
 
     @Override
-    public Call<List<PictureDTO>> getAll() {
-        return pictureApi.getAll();
+    public Call<List<PictureDTO>> findBySearch(String search) {
+        return pictureApi.findBySearch(search);
     }
 }

@@ -3,10 +3,7 @@ package org.sosoburger.api;
 import okhttp3.MultipartBody;
 import org.sosoburger.dto.PictureDTO;
 import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Multipart;
-import retrofit2.http.POST;
-import retrofit2.http.Part;
+import retrofit2.http.*;
 
 import java.util.List;
 
@@ -16,6 +13,6 @@ public interface PictureApi {
     Call<PictureDTO> upload(@Part MultipartBody.Part picture);
 
     @GET("/picture")
-    Call<List<PictureDTO>> getAll();
+    Call<List<PictureDTO>> findBySearch(@Query("search") String search);
 
 }

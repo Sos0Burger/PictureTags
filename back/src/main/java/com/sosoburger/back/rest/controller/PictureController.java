@@ -30,10 +30,10 @@ public class PictureController implements PictureApi {
     }
 
     @Override
-    public ResponseEntity<List<PictureDTO>> getAll() {
+    public ResponseEntity<List<PictureDTO>> getAll(String search) {
         List<PictureDTO> pictureDTOS = new ArrayList<>();
 
-        for (PictureDAO pic: pictureService.getAll()
+        for (PictureDAO pic: pictureService.findBySearch(search)
         ) {
             pictureDTOS.add(pic.toDTO());
         }

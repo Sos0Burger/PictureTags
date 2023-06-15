@@ -18,7 +18,7 @@ public interface PictureApi {
 
     @GetMapping
     @Operation(description = "Возращает все загруженные картики с тегами")
-    ResponseEntity<List<PictureDTO>> getAll();
+    ResponseEntity<List<PictureDTO>> getAll(@RequestParam String search);
 
     @GetMapping(value = "/data/{id}")
     ResponseEntity<byte[]> getPicture(@PathVariable Integer id);
