@@ -2,8 +2,10 @@ package org.sosoburger.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
@@ -13,14 +15,20 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.virtuallist.VirtualList;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.router.Route;
 import org.json.JSONObject;
 import org.sosoburger.api.PictureApiImpl;
 import org.sosoburger.dto.PictureDTO;
+import org.sosoburger.dto.Tag;
 import org.sosoburger.dto.TagDTO;
+import org.sosoburger.validator.ConfidenceValidator;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 @Route("uploaded")
 public class UploadedPictures extends VerticalLayout {
@@ -50,15 +58,61 @@ public class UploadedPictures extends VerticalLayout {
                 pictureLayout.add(details);
 
                 Grid<TagDTO> tagGrid = new Grid<>();
+                Editor<TagDTO> editor = tagGrid.getEditor();
+
                 tagGrid.setAllRowsVisible(true);
 
-
                 tagGrid.setItems(picture.getTags());
-                tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getTag().getRu()))
+
+                Grid.Column<TagDTO> tagColumn = tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getTagRu()))
                         .setHeader("Тег")
-                        .setComparator(tagDTO -> tagDTO.getTag().getRu()).setAutoWidth(true);
-                tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getConfidence().intValue() + "%"))
+                        .setComparator(TagDTO::getTagRu).setAutoWidth(true);
+                Grid.Column<TagDTO> confidenceColumn = tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getStringConfidence()))
                         .setHeader("Точность").setComparator(TagDTO::getConfidence).setAutoWidth(true);
+
+                Grid.Column<TagDTO> editColumn = tagGrid.addComponentColumn(tagDTO -> {
+                    Button editButton = new Button("Редактировать");
+                    editButton.addClickListener(e -> {
+                        if (editor.isOpen())
+                            editor.cancel();
+                        tagGrid.getEditor().editItem(tagDTO);
+                    });
+                    return editButton;
+                }).setAutoWidth(true);
+
+                Binder<TagDTO> binder = new Binder<>(TagDTO.class);
+                editor.setBinder(binder);
+                editor.setBuffered(true);
+
+                TextField tagField = new TextField();
+                tagField.setWidthFull();
+                binder.forField(tagField)
+                        .asRequired("Поле не должно быть пустым")
+                        .bind(TagDTO::getTagRu, TagDTO::setTagRu);
+                tagColumn.setEditorComponent(tagField);
+
+                TextField confidenceField = new TextField();
+                confidenceField.setWidthFull();
+                binder.forField(confidenceField)
+                        .asRequired("First name must not be empty")
+                        .withValidator(new ConfidenceValidator("Введите корректное значение, например 69%"))
+                        .bind(TagDTO::getStringConfidence, TagDTO::setConfidence);
+                confidenceColumn.setEditorComponent(confidenceField);
+
+                Button saveButton = new Button("Сохранить", e -> {
+                    var sfa = editor.getGrid().getDataProvider().fetch(new Query<>()).toList();
+                    System.out.println();
+                   // pictureApi.updatePicture(picture.getId(), tagGrid.)
+
+                });
+                Button cancelButton = new Button(VaadinIcon.CLOSE.create(),
+                        e -> editor.cancel());
+                cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
+                        ButtonVariant.LUMO_ERROR);
+                HorizontalLayout actions = new HorizontalLayout(saveButton,
+                        cancelButton);
+                actions.setPadding(false);
+                editColumn.setEditorComponent(actions);
 
                 pictureLayout.add(tagGrid);
                 return pictureLayout;

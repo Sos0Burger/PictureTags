@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PictureDTO {
 
+    private Integer id;
     private String pictureURL;
     private String name;
     private List<TagDTO> tags;

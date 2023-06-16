@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class PictureDTO {
-
+    private Integer id;
     private String pictureURL;
     private String name;
     private List<TagDTO> tags;

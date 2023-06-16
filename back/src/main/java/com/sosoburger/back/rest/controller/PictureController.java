@@ -2,6 +2,7 @@ package com.sosoburger.back.rest.controller;
 
 import com.sosoburger.back.dao.PictureDAO;
 import com.sosoburger.back.dto.PictureDTO;
+import com.sosoburger.back.dto.TagDTO;
 import com.sosoburger.back.rest.api.PictureApi;
 import com.sosoburger.back.service.PictureService.PictureService;
 import lombok.SneakyThrows;
@@ -47,5 +48,10 @@ public class PictureController implements PictureApi {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type", pictureDAO.getType());
         return new ResponseEntity<>(pictureDAO.getData(), responseHeaders, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<PictureDTO> updateTags(Integer id, List<TagDTO> tagDTOs) {
+        return new ResponseEntity<>(pictureService.updatePicture(id, tagDTOs).toDTO(), HttpStatus.OK);
     }
 }

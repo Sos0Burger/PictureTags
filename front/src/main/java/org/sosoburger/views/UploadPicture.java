@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
@@ -37,17 +38,20 @@ import java.util.concurrent.atomic.AtomicReference;
 public class UploadPicture extends VerticalLayout {
 
     private static final PictureApiImpl pictureApi = new PictureApiImpl();
+
+    MemoryBuffer buffer = new MemoryBuffer();
+    Upload imageUpload = new Upload(buffer);
+    Button uploadToServerButton = new Button("Загрузить");
+    Div imageContainer = new Div();
+    Div textContainer = new Div();
+    Scroller scroller = new Scroller();
+
+    Button navigateButton = new Button("Посмотреть загруженные изображения");
+
+    AtomicReference<MultipartBody.Part> multipartFile = new AtomicReference<>();
+
     public UploadPicture() {
         this.setAlignItems(Alignment.CENTER);
-
-        AtomicReference<MultipartBody.Part> multipartFile = new AtomicReference<>();
-
-        MemoryBuffer buffer = new MemoryBuffer();
-        Upload imageUpload = new Upload(buffer);
-        Button uploadToServerButton = new Button("Загрузить");
-        Div imageContainer = new Div();
-        Div textContainer = new Div();
-        Scroller scroller = new Scroller();
 
         imageUpload.setDropLabel(new Label("Перетащите изображение сюда"));
         imageUpload.setUploadButton(new Button("Выбрать файл"));
@@ -84,7 +88,7 @@ public class UploadPicture extends VerticalLayout {
 
 
         uploadToServerButton.addClickListener(buttonClickEvent ->
-            uploadOnClick(multipartFile, scroller,textContainer)
+            uploadOnClick()
         );
 
 
@@ -97,10 +101,15 @@ public class UploadPicture extends VerticalLayout {
                 .set("padding", "var(--lumo-space-m)");
         scroller.setHeight("128px");
 
-        add(imageUpload, imageContainer, uploadToServerButton, textContainer, scroller);
+        navigateButton.addClickListener(e ->
+                navigateButton.getUI().ifPresent(ui ->
+                        ui.navigate("uploaded"))
+        );
+
+        add(navigateButton, imageUpload, imageContainer, uploadToServerButton, textContainer, scroller);
     }
 
-    private void uploadOnClick(AtomicReference<MultipartBody.Part> multipartFile, Scroller scroller, Div textContainer ){
+    private void uploadOnClick(){
         Response<PictureDTO> response;
         try {
             response = pictureApi.upload(multipartFile.get()).execute();
@@ -125,6 +134,7 @@ public class UploadPicture extends VerticalLayout {
         } catch (IOException e) {
             textContainer.add(new Label("Произошла ошибка"));
         }
+        uploadToServerButton.setEnabled(true);
     }
     private Component imageComponent(String mimeType, String fileName, InputStream stream) {
         if (mimeType.startsWith("image")) {

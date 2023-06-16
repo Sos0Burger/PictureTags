@@ -13,4 +13,19 @@ public class TagDTO {
     private Float confidence;
     private Tag tag;
 
+    public void setTagRu(String tagRu){
+        tag.setRu(tagRu);
+    }
+
+    public String getTagRu(){
+        return tag.getRu();
+    }
+
+    public String getStringConfidence(){
+        return confidence.intValue()+"%";
+    }
+
+    public void setConfidence(String confidence){
+        this.confidence = Float.parseFloat(confidence.replace("%", ""));
+    }
 }

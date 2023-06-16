@@ -41,6 +41,7 @@ public class PictureDAO {
 
     public PictureDTO toDTO() {
         return new PictureDTO(
+                id,
                 ServletUriComponentsBuilder
                         .fromCurrentContextPath()
                         .path("/picture/data/")

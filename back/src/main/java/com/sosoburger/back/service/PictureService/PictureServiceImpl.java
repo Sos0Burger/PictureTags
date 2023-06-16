@@ -77,6 +77,17 @@ public class PictureServiceImpl implements PictureService {
                 .toList();
     }
 
+    @SneakyThrows
+    @Override
+    public PictureDAO updatePicture(Integer id, List<TagDTO> tagDTOs) {
+        if(picturesRepository.existsById(id)){
+            PictureDAO pictureDAO = picturesRepository.findById(id).get();
+            pictureDAO.setTags(tagDTOs);
+            return picturesRepository.save(pictureDAO);
+        }
+        throw new NotFoundException("ID не существует");
+    }
+
 
     @SneakyThrows
     private List<TagDTO> getTags(MultipartFile picture) {
