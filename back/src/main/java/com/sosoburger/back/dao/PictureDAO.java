@@ -10,9 +10,7 @@ import lombok.Setter;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "picture")
@@ -21,15 +19,14 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PictureDAO {
+
     @Id
     @Column(name = "pictureid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer pictureid;
 
     @Column(name = "tags")
-    @OneToMany
-    @JoinColumn(name = "tag_id")
-    private Set<TagDAO> tags = new HashSet<>();
+    private List<Integer> tags = new ArrayList<>();
 
     @Column(name = "data")
     @Lob
@@ -41,9 +38,13 @@ public class PictureDAO {
     @Column(name = "name")
     private String name;
 
-    public PictureDTO toDTO() {
+    public List<Integer> getTags() {
+        return tags==null?new ArrayList<>():tags;
+    }
+
+    public PictureDTO toDTO(List<TagDAO> tagDAOs) {
         List<TagDTO> tagDTOs = new ArrayList<>();
-        for (var item:tags
+        for (var item:tagDAOs
              ) {
             tagDTOs.add(item.toDTO());
         }

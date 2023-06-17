@@ -2,7 +2,6 @@ package com.sosoburger.back.rest.controller;
 
 import com.sosoburger.back.dao.PictureDAO;
 import com.sosoburger.back.dto.PictureDTO;
-import com.sosoburger.back.imagga.ImaggaTagDTO;
 import com.sosoburger.back.rest.api.PictureApi;
 import com.sosoburger.back.service.PictureService.PictureService;
 import lombok.SneakyThrows;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -32,13 +30,7 @@ public class PictureController implements PictureApi {
 
     @Override
     public ResponseEntity<List<PictureDTO>> getAll(String search) {
-        List<PictureDTO> pictureDTOS = new ArrayList<>();
-
-        for (PictureDAO pic: pictureService.findBySearch(search)
-        ) {
-            pictureDTOS.add(pic.toDTO());
-        }
-
+        List<PictureDTO> pictureDTOS = pictureService.findBySearch(search);
         return new ResponseEntity<>(pictureDTOS, HttpStatus.OK);
     }
 
