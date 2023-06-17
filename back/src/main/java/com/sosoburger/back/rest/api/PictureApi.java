@@ -1,7 +1,7 @@
 package com.sosoburger.back.rest.api;
 
 import com.sosoburger.back.dto.PictureDTO;
-import com.sosoburger.back.dto.TagDTO;
+import com.sosoburger.back.imagga.ImaggaTagDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +23,4 @@ public interface PictureApi {
 
     @GetMapping(value = "/data/{id}")
     ResponseEntity<byte[]> getPicture(@PathVariable Integer id);
-
-    @PutMapping(value = "{id}")
-    ResponseEntity<PictureDTO> updateTags(@PathVariable("id") Integer id, @RequestBody List<TagDTO> tagDTOs);
-
 }

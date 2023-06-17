@@ -6,10 +6,26 @@ databaseChangeLog:
       runOnChange: true
       changes:
         - createTable:
+            tableName: tag
+            columns:
+              - column:
+                  name: tag_id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: confidence
+                  type: REAL
+              - column:
+                  name: tag_name
+                  type: VARCHAR
+        - createTable:
             tableName: picture
             columns:
               - column:
-                  name: id
+                  name: pictureid
                   type: INT
                   autoIncrement: true
                   constraints:
@@ -17,7 +33,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: tags
-                  type: JSONB
+                  type: INT[]
               - column:
                   name: data
                   type: BLOB

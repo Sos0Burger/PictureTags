@@ -11,16 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TagDTO {
     private Float confidence;
-    private Tag tag;
-
-    public void setTagRu(String tagRu){
-        tag.setRu(tagRu);
-    }
-
-    public String getTagRu(){
-        return tag.getRu();
-    }
-
+    private String tag_name;
     public String getStringConfidence(){
         return confidence.intValue()+"%";
     }

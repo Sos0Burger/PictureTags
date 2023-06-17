@@ -1,4 +1,4 @@
-package org.sosoburger.dto;
+package com.sosoburger.back.imagga;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Tag{
+public class ImaggaTag {
     private String ru;
 }

@@ -7,11 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "picture")
@@ -21,13 +22,14 @@ import java.util.List;
 @AllArgsConstructor
 public class PictureDAO {
     @Id
-    @Column(name = "id")
+    @Column(name = "pictureid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer pictureid;
 
     @Column(name = "tags")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<TagDTO> tags;
+    @OneToMany
+    @JoinColumn(name = "tag_id")
+    private Set<TagDAO> tags = new HashSet<>();
 
     @Column(name = "data")
     @Lob
@@ -40,15 +42,21 @@ public class PictureDAO {
     private String name;
 
     public PictureDTO toDTO() {
+        List<TagDTO> tagDTOs = new ArrayList<>();
+        for (var item:tags
+             ) {
+            tagDTOs.add(item.toDTO());
+        }
+
         return new PictureDTO(
-                id,
+                pictureid,
                 ServletUriComponentsBuilder
                         .fromCurrentContextPath()
                         .path("/picture/data/")
-                        .path(id.toString())
+                        .path(pictureid.toString())
                         .toUriString(),
                 name,
-                tags);
+                tagDTOs);
     }
 
 }

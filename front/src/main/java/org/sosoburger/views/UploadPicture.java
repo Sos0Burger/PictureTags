@@ -117,7 +117,7 @@ public class UploadPicture extends VerticalLayout {
                 Div div = new Div();
                 for (TagDTO tag:response.body().getTags()
                 ) {
-                    div.add(new Div(new Label(tag.getTag().getRu()+":"+tag.getConfidence().intValue()+"%\n")));
+                    div.add(new Div(new Label(tag.getTag_name()+":"+tag.getConfidence().intValue()+"%\n")));
                 }
                 scroller.setContent(div);
             }

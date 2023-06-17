@@ -16,19 +16,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.router.Route;
 import org.json.JSONObject;
 import org.sosoburger.api.PictureApiImpl;
 import org.sosoburger.dto.PictureDTO;
-import org.sosoburger.dto.Tag;
 import org.sosoburger.dto.TagDTO;
 import org.sosoburger.validator.ConfidenceValidator;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 @Route("uploaded")
 public class UploadedPictures extends VerticalLayout {
@@ -64,9 +60,9 @@ public class UploadedPictures extends VerticalLayout {
 
                 tagGrid.setItems(picture.getTags());
 
-                Grid.Column<TagDTO> tagColumn = tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getTagRu()))
+                Grid.Column<TagDTO> tagColumn = tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getTag_name()))
                         .setHeader("Тег")
-                        .setComparator(TagDTO::getTagRu).setAutoWidth(true);
+                        .setComparator(TagDTO::getTag_name).setAutoWidth(true);
                 Grid.Column<TagDTO> confidenceColumn = tagGrid.addComponentColumn(tagDTO -> new Label(tagDTO.getStringConfidence()))
                         .setHeader("Точность").setComparator(TagDTO::getConfidence).setAutoWidth(true);
 
@@ -88,21 +84,23 @@ public class UploadedPictures extends VerticalLayout {
                 tagField.setWidthFull();
                 binder.forField(tagField)
                         .asRequired("Поле не должно быть пустым")
-                        .bind(TagDTO::getTagRu, TagDTO::setTagRu);
+                        .bind(TagDTO::getTag_name, TagDTO::setTag_name);
                 tagColumn.setEditorComponent(tagField);
 
                 TextField confidenceField = new TextField();
                 confidenceField.setWidthFull();
                 binder.forField(confidenceField)
-                        .asRequired("First name must not be empty")
+                        .asRequired("Поле не должно быть пустым")
                         .withValidator(new ConfidenceValidator("Введите корректное значение, например 69%"))
                         .bind(TagDTO::getStringConfidence, TagDTO::setConfidence);
                 confidenceColumn.setEditorComponent(confidenceField);
 
                 Button saveButton = new Button("Сохранить", e -> {
-                    var sfa = editor.getGrid().getDataProvider().fetch(new Query<>()).toList();
+                    var sfa = editor.getItem();
+
                     System.out.println();
-                   // pictureApi.updatePicture(picture.getId(), tagGrid.)
+
+                   //pictureApi.updatePicture(picture.getId(), tagGrid.)
 
                 });
                 Button cancelButton = new Button(VaadinIcon.CLOSE.create(),
