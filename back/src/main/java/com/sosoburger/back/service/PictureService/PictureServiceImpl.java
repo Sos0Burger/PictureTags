@@ -2,11 +2,12 @@ package com.sosoburger.back.service.PictureService;
 
 import com.sosoburger.back.dao.PictureDAO;
 import com.sosoburger.back.dto.PictureDTO;
-import com.sosoburger.back.dto.TagDTO;
 import com.sosoburger.back.exception.NotFoundException;
 import com.sosoburger.back.exception.UploadException;
 import com.sosoburger.back.imagga.ImaggaApiImpl;
+import com.sosoburger.back.imagga.ImaggaTagDTO;
 import com.sosoburger.back.repository.PicturesRepository;
+import com.sosoburger.back.repository.TagsRepository;
 import lombok.SneakyThrows;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -18,29 +19,39 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class PictureServiceImpl implements PictureService {
     @Autowired
     private PicturesRepository picturesRepository;
+    @Autowired
+    private TagsRepository tagsRepository;
 
     private final ImaggaApiImpl imaggaApi = new ImaggaApiImpl();
 
     @SneakyThrows
     @Override
     public PictureDTO save(MultipartFile picture) {
-        List<TagDTO> tagDTOs = getTags(picture);
+        List<ImaggaTagDTO> imaggaTagDTOS = getTags(picture);
+
+        List<Integer> tags = new ArrayList<>();
+        for (var item:imaggaTagDTOS
+             ) {
+            tags.add(tagsRepository.save(item.toTagDAO()).getTag_id());
+        }
+
         try {
             return picturesRepository.save(
                     new PictureDAO(
                             null,
-                            tagDTOs,
+                            tags,
                             picture.getBytes(),
                             picture.getContentType(),
                             picture.getOriginalFilename()
                     )
-            ).toDTO();
+            ).toDTO(tagsRepository.findAllById(tags));
         } catch (IOException exception) {
             throw new UploadException("Ошибка загрузки файла");
         }
@@ -56,41 +67,36 @@ public class PictureServiceImpl implements PictureService {
     }
 
     @Override
-    public List<PictureDAO> findBySearch(String search) {
+    public List<PictureDTO> findBySearch(String search) {
+        List<PictureDAO> pictureDAOs;
         if (search==null||search.isEmpty()){
-            return  picturesRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+           pictureDAOs = picturesRepository.findAll(Sort.by(Sort.Direction.DESC, "pictureid"));
         }
-        return picturesRepository.findAll(Sort.by(Sort.Direction.DESC,"id")).
-                stream()
-                .filter(
-                        item->
-                                item.getTags()
-                                        .stream()
-                                        .anyMatch(
-                                                tag -> tag.getTag()
-                                                        .getRu().toLowerCase()
-                                                        .contains(search.toLowerCase())
-                                                ||      (tag.getConfidence().intValue()+"%")
-                                                        .contains(search)
-                                        )
-                )
-                .toList();
-    }
-
-    @SneakyThrows
-    @Override
-    public PictureDAO updatePicture(Integer id, List<TagDTO> tagDTOs) {
-        if(picturesRepository.existsById(id)){
-            PictureDAO pictureDAO = picturesRepository.findById(id).get();
-            pictureDAO.setTags(tagDTOs);
-            return picturesRepository.save(pictureDAO);
+        else {
+            pictureDAOs = picturesRepository.findAll(Sort.by(Sort.Direction.DESC, "pictureid")).
+                    stream()
+                    .filter(
+                            item ->
+                                    item.getTags()
+                                            .stream()
+                                            .anyMatch(
+                                                    tag -> tagsRepository.findById(tag).get().getTag_name().toLowerCase()
+                                                            .contains(search.toLowerCase())
+                                                            || (tagsRepository.findById(tag).get().getConfidence().intValue() + "%")
+                                                            .contains(search)
+                                            )
+                    )
+                    .toList();
         }
-        throw new NotFoundException("ID не существует");
+        List<PictureDTO> pictureDTOs = new ArrayList<>();
+        for (var item: pictureDAOs
+             ) {
+            pictureDTOs.add(item.toDTO(tagsRepository.findAllById(item.getTags())));
+        }
+        return pictureDTOs;
     }
-
-
     @SneakyThrows
-    private List<TagDTO> getTags(MultipartFile picture) {
+    private List<ImaggaTagDTO> getTags(MultipartFile picture) {
         try {
             var response = imaggaApi.upload(
                     MultipartBody.Part.createFormData(

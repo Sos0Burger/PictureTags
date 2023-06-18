@@ -20,7 +20,9 @@ public class PictureApiImpl implements PictureApi{
     }
 
     @Override
-    public Call<PictureDTO> updatePicture(Integer id, List<TagDTO> tagDTOs) {
-        return pictureApi.updatePicture(id, tagDTOs);
+    public Call<TagDTO> updateTag(TagDTO tag) {
+        return pictureApi.updateTag(tag);
     }
+
+
 }

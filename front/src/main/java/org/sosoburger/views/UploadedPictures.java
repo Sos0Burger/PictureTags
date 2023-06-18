@@ -11,6 +11,8 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -96,11 +98,36 @@ public class UploadedPictures extends VerticalLayout {
                 confidenceColumn.setEditorComponent(confidenceField);
 
                 Button saveButton = new Button("Сохранить", e -> {
-                    var sfa = editor.getItem();
+                    try {
+                        var response = pictureApi.updateTag(
+                                new TagDTO(
+                                        editor.getItem().getId(),
+                                        Float.parseFloat(confidenceField.
+                                                getValue()
+                                                .replace("%", "")),
+                                        tagField.getValue())
+                        )
+                                .execute();
+                        if (response.isSuccessful()){
+                            editor.save();
+                        }
+                        else{
+                            Notification notification =
+                                    Notification.show(
+                                            "Не удалось сохранить",
+                                            500,
+                                            Notification.Position.BOTTOM_CENTER);
+                            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                        }
+                    } catch (IOException ex) {
+                        Notification notification =
+                                Notification.show(
+                                        "Не удалось сохранить",
+                                        500,
+                                        Notification.Position.BOTTOM_CENTER);
+                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    }
 
-                    System.out.println();
-
-                   //pictureApi.updatePicture(picture.getId(), tagGrid.)
 
                 });
                 Button cancelButton = new Button(VaadinIcon.CLOSE.create(),

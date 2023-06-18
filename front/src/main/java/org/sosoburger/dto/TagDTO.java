@@ -10,6 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TagDTO {
+
+    private Integer id;
+
     private Float confidence;
     private String tag_name;
     public String getStringConfidence(){
