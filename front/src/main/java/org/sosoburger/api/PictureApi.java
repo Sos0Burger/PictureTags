@@ -19,4 +19,6 @@ public interface PictureApi {
     @PUT("/tag")
     Call<TagDTO> updateTag(@Body TagDTO tag);
 
+    @DELETE("/tag")
+    Call<Void> deleteTag(@Query("pictureid") Integer pictureId, @Query("tagid") Integer tagId);
 }

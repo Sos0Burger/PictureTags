@@ -5,4 +5,6 @@ import com.sosoburger.back.dto.TagDTO;
 
 public interface TagService {
     TagDAO updateTag(TagDTO tag);
+
+    void delete(Integer pictureId, Integer tagId);
 }

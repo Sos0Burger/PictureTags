@@ -86,6 +86,19 @@ public class UploadedPictures extends VerticalLayout {
                         if (editor.isOpen())
                             editor.cancel();
 
+                        try {
+                            var response = pictureApi.deleteTag(picture.getId(), tagDTO.getId()).execute();
+                            if(response.isSuccessful()){
+                                picture.getTags().remove(tagDTO);
+                                tagGrid.getDataProvider().refreshAll();
+                            }
+                            else {
+                                showErrorNotification("Не удалось удалить");
+                            }
+                        } catch (IOException ex) {
+                            showErrorNotification("Не удалось удалить");
+                        }
+
                     });
                     return deleteButton;
                 }).setAutoWidth(true);
@@ -124,20 +137,10 @@ public class UploadedPictures extends VerticalLayout {
                             editor.save();
                         }
                         else{
-                            Notification notification =
-                                    Notification.show(
-                                            "Не удалось сохранить",
-                                            500,
-                                            Notification.Position.BOTTOM_CENTER);
-                            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                            showErrorNotification("Не удалось сохранить");
                         }
                     } catch (IOException ex) {
-                        Notification notification =
-                                Notification.show(
-                                        "Не удалось сохранить",
-                                        500,
-                                        Notification.Position.BOTTOM_CENTER);
-                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                        showErrorNotification("Не удалось сохранить");
                     }
 
 
@@ -192,5 +195,14 @@ public class UploadedPictures extends VerticalLayout {
             text.add(new Label("Произошла ошибка"));
         }
 
+    }
+
+    private void showErrorNotification(String text){
+        Notification notification =
+                Notification.show(
+                        text,
+                        1000,
+                        Notification.Position.BOTTOM_CENTER);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
     }
 }

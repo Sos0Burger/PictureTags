@@ -21,4 +21,10 @@ public class TagController implements TagApi {
     public ResponseEntity<TagDTO> updateTag(TagDTO tag) {
         return new ResponseEntity<>(tagService.updateTag(tag).toDTO(), HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<?> deleteTag(Integer pictureId, Integer tagId) {
+        tagService.delete(pictureId, tagId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

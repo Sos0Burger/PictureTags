@@ -24,5 +24,10 @@ public class PictureApiImpl implements PictureApi{
         return pictureApi.updateTag(tag);
     }
 
+    @Override
+    public Call<Void> deleteTag(Integer pictureId, Integer tagId) {
+        return pictureApi.deleteTag(pictureId, tagId);
+    }
+
 
 }
