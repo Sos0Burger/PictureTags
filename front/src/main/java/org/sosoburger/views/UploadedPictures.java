@@ -78,6 +78,18 @@ public class UploadedPictures extends VerticalLayout {
                     return editButton;
                 }).setAutoWidth(true);
 
+                Grid.Column<TagDTO> deleteColumn = tagGrid.addComponentColumn(tagDTO -> {
+                    Button deleteButton = new Button("Удалить");
+                    deleteButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY,
+                            ButtonVariant.LUMO_ERROR);
+                    deleteButton.addClickListener(e -> {
+                        if (editor.isOpen())
+                            editor.cancel();
+
+                    });
+                    return deleteButton;
+                }).setAutoWidth(true);
+
                 Binder<TagDTO> binder = new Binder<>(TagDTO.class);
                 editor.setBinder(binder);
                 editor.setBuffered(true);
