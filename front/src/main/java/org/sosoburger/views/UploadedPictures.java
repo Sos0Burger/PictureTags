@@ -31,16 +31,9 @@ import java.io.IOException;
 @Route("uploaded")
 public class UploadedPictures extends VerticalLayout {
 
+    private static final int maxPictureNameLength = 16;
+
     PictureApiImpl pictureApi = new PictureApiImpl();
-
-    VirtualList<PictureDTO> pictureList = new VirtualList<>();
-
-    Div text = new Div();
-
-    TextField searchField = new TextField();
-
-    Button searchButton = new Button("Найти");
-
     private final ComponentRenderer<Component, PictureDTO> pictureRenderer = new ComponentRenderer<>(
             picture -> {
                 HorizontalLayout pictureLayout = new HorizontalLayout();
@@ -50,9 +43,37 @@ public class UploadedPictures extends VerticalLayout {
 
                 Image image = new Image(picture.getPictureURL(), "https://i.imgur.com/UWzk1sl.png");
 
-                Details details = new Details(picture.getName(), image);
+                Details details = new Details(
+                        picture.getName().length() > maxPictureNameLength ?
+                                picture
+                                        .getName()
+                                        .substring(
+                                                0,
+                                                maxPictureNameLength - 3) + "..."
+                                :
+                                picture.getName(),
+                        image);
                 details.getSummary().getStyle().set("font-size", "30px");
                 details.getSummary().getStyle().set("color", "blue");
+                details.getSummary().getStyle().set("white-space", "pre");
+                details.addOpenedChangeListener(e -> {
+                    if (e.isOpened()) {
+                        details.setSummaryText(picture.getName());
+                    } else {
+                        details.setSummaryText(picture.getName().length() > maxPictureNameLength ?
+                                picture
+                                        .getName()
+                                        .substring(
+                                                0,
+                                                maxPictureNameLength - 3) + "..."
+                                :
+                                picture
+                                        .getName()
+                        );
+                    }
+                    details.getSummary().getStyle().set("font-size", "30px");
+                    details.getSummary().getStyle().set("color", "blue");
+                });
                 pictureLayout.add(details);
 
                 Grid<TagDTO> tagGrid = new Grid<>();
@@ -82,21 +103,23 @@ public class UploadedPictures extends VerticalLayout {
                     Button deleteButton = new Button("Удалить");
                     deleteButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY,
                             ButtonVariant.LUMO_ERROR);
+                    deleteButton.setDisableOnClick(true);
                     deleteButton.addClickListener(e -> {
                         if (editor.isOpen())
                             editor.cancel();
 
                         try {
                             var response = pictureApi.deleteTag(picture.getId(), tagDTO.getId()).execute();
-                            if(response.isSuccessful()){
+                            if (response.isSuccessful()) {
                                 picture.getTags().remove(tagDTO);
                                 tagGrid.getDataProvider().refreshAll();
-                            }
-                            else {
+                            } else {
                                 showErrorNotification("Не удалось удалить");
+                                deleteButton.setEnabled(true);
                             }
                         } catch (IOException ex) {
                             showErrorNotification("Не удалось удалить");
+                            deleteButton.setEnabled(true);
                         }
 
                     });
@@ -125,18 +148,17 @@ public class UploadedPictures extends VerticalLayout {
                 Button saveButton = new Button("Сохранить", e -> {
                     try {
                         var response = pictureApi.updateTag(
-                                new TagDTO(
-                                        editor.getItem().getId(),
-                                        Float.parseFloat(confidenceField.
-                                                getValue()
-                                                .replace("%", "")),
-                                        tagField.getValue())
-                        )
+                                        new TagDTO(
+                                                editor.getItem().getId(),
+                                                Float.parseFloat(confidenceField.
+                                                        getValue()
+                                                        .replace("%", "")),
+                                                tagField.getValue())
+                                )
                                 .execute();
-                        if (response.isSuccessful()){
+                        if (response.isSuccessful()) {
                             editor.save();
-                        }
-                        else{
+                        } else {
                             showErrorNotification("Не удалось сохранить");
                         }
                     } catch (IOException ex) {
@@ -157,6 +179,11 @@ public class UploadedPictures extends VerticalLayout {
                 pictureLayout.add(tagGrid);
                 return pictureLayout;
             });
+    VirtualList<PictureDTO> pictureList = new VirtualList<>();
+    Div text = new Div();
+    TextField searchField = new TextField();
+    Button searchButton = new Button("Найти");
+    Button navigateButton = new Button("Загрузить картинку");
 
     public UploadedPictures() {
         setSizeFull();
@@ -166,15 +193,18 @@ public class UploadedPictures extends VerticalLayout {
         searchField.setPlaceholder("Поиск");
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
 
-        searchButton.addClickListener(event->setUploadedPictures(searchField.getValue()));
+        searchButton.addClickListener(event -> setUploadedPictures(searchField.getValue()));
 
-        HorizontalLayout searchLayout = new HorizontalLayout(searchField, searchButton);
+        navigateButton.addClickListener(e ->
+                navigateButton.getUI().ifPresent(ui ->
+                        ui.navigate(""))
+        );
+
+        HorizontalLayout topBarLayout = new HorizontalLayout(navigateButton, searchField, searchButton);
 
         pictureList.setRenderer(pictureRenderer);
 
-
-
-        add(searchLayout, pictureList, text);
+        add(topBarLayout, pictureList, text);
         setUploadedPictures("");
     }
 
@@ -197,7 +227,7 @@ public class UploadedPictures extends VerticalLayout {
 
     }
 
-    private void showErrorNotification(String text){
+    private void showErrorNotification(String text) {
         Notification notification =
                 Notification.show(
                         text,
