@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.File;
 import java.nio.file.Files;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,7 +64,12 @@ public class PictureControllerTest {
 
     @Test
     void getAll() {
-
+        try {
+            //todo как-то по другому проверять
+            mvc.perform(get("/picture").param("search","")).andExpect(status().isOk());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }
